@@ -14,11 +14,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit(
-        WeatherRepository(WeatherRemoteDataSource()),
-      ),
-      child: BlocListener<HomeCubit, HomeState>(
-        listener: (context, state) {
+        create: (context) => HomeCubit(
+              WeatherRepository(WeatherRemoteDataSource()),
+            ),
+        child: BlocConsumer<HomeCubit, HomeState>(listener: (context, state) {
           if (state.status == Status.error) {
             final errorMessage = state.errorMessage ?? 'Unkown error';
             ScaffoldMessenger.of(context).showSnackBar(
@@ -28,36 +27,31 @@ class HomePage extends StatelessWidget {
               ),
             );
           }
-        },
-        child: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
-            final weatherModel = state.model;
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Temperature'),
-              ),
-              body: Center(
-                child: Builder(builder: (context) {
-                  if (state.status == Status.loading) {
-                    return const Text('Loading');
-                  }
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (weatherModel != null)
-                        _DisplayWeatherWidget(
-                          weatherModel: weatherModel,
-                        ),
-                      _SearchWidget(),
-                    ],
-                  );
-                }),
-              ),
-            );
-          },
-        ),
-      ),
-    );
+        }, builder: (context, state) {
+          final weatherModel = state.model;
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Temperature'),
+            ),
+            body: Center(
+              child: Builder(builder: (context) {
+                if (state.status == Status.loading) {
+                  return const Text('Loading');
+                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (weatherModel != null)
+                      _DisplayWeatherWidget(
+                        weatherModel: weatherModel,
+                      ),
+                    _SearchWidget(),
+                  ],
+                );
+              }),
+            ),
+          );
+        }));
   }
 }
 
